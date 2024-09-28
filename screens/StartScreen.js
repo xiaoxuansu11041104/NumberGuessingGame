@@ -12,7 +12,9 @@ export default function StartScreen() {
     const [email, setEmail] = useState('');
     const [emailError, setEmailError] = useState('');
 
-    // 
+    // Create state variables for phone and phoneError
+    const [phone, setPhone] = useState('');
+    const [phoneError, setPhoneError] = useState('');
 
     // Create a function to handle the name input
     const handleNameChange = (text) => {
@@ -30,16 +32,31 @@ export default function StartScreen() {
 
     // Create a function to handle the email input
     const handleEmailChange = (text) => {
-        // Set the email state variable to the text input
         setEmail(text);
-        // Check if the email is valid
-        if (!text.includes('@') || !text.includes('.')) {
-            setEmailError('Please enter a valid email');
+        // Simple email regex for validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(text)) {
+            setEmailError('Please enter a valid email address');
         } else {
-            // Clear the error message
             setEmailError('');
         }
-    }
+    };
+
+    // Function to handle and validate the phone number input
+    const handlePhoneChange = (text) => {
+        setPhone(text);
+        const phoneRegex = /^[0-9]{10}$/;  // Validate that the input has exactly 10 digits
+        const lastDigit = text.charAt(text.length - 1);  // Get the last digit of the phone number
+
+        if (!phoneRegex.test(text)) {
+            setPhoneError('Phone number must be exactly 10 digits');
+        } else if (lastDigit === '0' || lastDigit === '1') {
+            setPhoneError('The last digit of the phone number cannot be 0 or 1');
+        } else {
+            setPhoneError('');
+        }
+    };
+
     return (
         <View style={styles.container}>
             {/* display the header here */}
@@ -69,6 +86,19 @@ export default function StartScreen() {
                     />
                     {/* display the email error message here */}
                     {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
+                </View>
+                {/* Phone Input */}
+                <View style={styles.inputContainer}>
+                    <Text style={styles.label}>Phone Number</Text>
+                    <TextInput
+                        style={styles.input}
+                        onChangeText={handlePhoneChange}
+                        value={phone}
+                        placeholder="Enter your phone number"
+                        keyboardType="numeric"
+                    />
+                    {/* display the phone error message here */}
+                    {phoneError ? <Text style={styles.errorText}>{phoneError}</Text> : null}
                 </View>
             </Card>
             
