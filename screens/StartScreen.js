@@ -2,6 +2,7 @@ import { StyleSheet, Text, View, TextInput } from 'react-native'
 import React, { useState } from 'react'
 import Header from '../components/Header'
 import Card from '../components/Card'
+import Checkbox from 'expo-checkbox'; 
 
 export default function StartScreen() {
     // Create state variables for name and nameError
@@ -15,6 +16,9 @@ export default function StartScreen() {
     // Create state variables for phone and phoneError
     const [phone, setPhone] = useState('');
     const [phoneError, setPhoneError] = useState('');
+
+    // Create state variables for the checkbox
+    const [isSelected, setSelection] = useState(false);
 
     // Create a function to handle the name input
     const handleNameChange = (text) => {
@@ -56,6 +60,8 @@ export default function StartScreen() {
             setPhoneError('');
         }
     };
+
+    
 
     return (
         <View style={styles.container}>
@@ -99,6 +105,15 @@ export default function StartScreen() {
                     />
                     {/* display the phone error message here */}
                     {phoneError ? <Text style={styles.errorText}>{phoneError}</Text> : null}
+                    {/* Checkbox and label */}
+                    <View style={styles.checkboxContainer}>
+                        <Checkbox
+                            value={isSelected}
+                            onValueChange={setSelection}
+                            color={isSelected ? 'blue' : undefined}
+                        />
+                        <Text style={styles.checkboxLabel}>I am not a robot</Text>
+                    </View>
                 </View>
             </Card>
             
@@ -141,5 +156,14 @@ const styles = StyleSheet.create({
     errorText: {
         color: 'red',
         marginBottom: 10,
+    },
+    checkboxContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 20,
+    },
+    checkboxLabel: {
+        marginLeft: 8,
+        color: 'purple',
     },
 });
