@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, TextInput } from 'react-native'
+import { StyleSheet, Text, View, TextInput, Button } from 'react-native'
 import React, { useState } from 'react'
 import Header from '../components/Header'
 import Card from '../components/Card'
@@ -61,6 +61,17 @@ export default function StartScreen() {
         }
     };
 
+    // Function to handle the reset button
+    const handleReset = () => {
+        setName('');
+        setEmail('');
+        setPhone('');
+        setSelection(false);
+        setNameError('');
+        setEmailError('');
+        setPhoneError('');
+    };
+
     
 
     return (
@@ -114,6 +125,14 @@ export default function StartScreen() {
                         />
                         <Text style={styles.checkboxLabel}>I am not a robot</Text>
                     </View>
+                    {/* Reset Button */}
+                    <Button
+                        title="Reset"
+                        onPress={handleReset}
+                        color="red" // Red button for reset action
+                        style={styles.resetButton}
+                    />
+
                 </View>
             </Card>
             
@@ -165,5 +184,8 @@ const styles = StyleSheet.create({
     checkboxLabel: {
         marginLeft: 8,
         color: 'purple',
+    },
+    resetButton: {
+        marginTop: 20,
     },
 });
