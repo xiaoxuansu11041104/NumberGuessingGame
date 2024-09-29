@@ -12,6 +12,9 @@ export default function GameScreen({ phone, onRestart }) {
     const [attempts, setAttempts] = useState(4);
     const [isGameStarted, setIsGameStarted] = useState(false);
     const [guess, setGuess] = useState('');
+    const [hint, setHint] = useState(null);
+    const [hintRange, setHintRange] = useState({ low: 0, high: 100 }); // Initial range
+    const [hintsUsed, setHintsUsed] = useState(0); // Number of hints used
 
     // Function to generate the number to guess
     const generateNumber = () => {
@@ -57,12 +60,35 @@ export default function GameScreen({ phone, onRestart }) {
         }
     };
 
-    // Function to provide a hint
+    // Function to provide a range hint, which halves with each hint request
     const handleHint = () => {
-        if (hint === null) {
-            setHint(`The number is a multiple of ${phone.slice(-1)}`);
+        const { low, high } = hintRange;
+
+        // For the first hint, split the range into [0, 50] and [50, 100]
+        if (hintsUsed === 0) {
+            if (gameNumber > 50) {
+                setHint('The number is between 50 and 100.');
+                setHintRange({ low: 50, high: 100 });
+            } else {
+                setHint('The number is between 0 and 50.');
+                setHintRange({ low: 0, high: 50 });
+            }
+        } else {
+            // For subsequent hints, halve the range
+            const mid = Math.floor((low + high) / 2);
+            if (gameNumber > mid) {
+                setHint(`The number is between ${mid} and ${high}.`);
+                setHintRange({ low: mid, high });
+            } else {
+                setHint(`The number is between ${low} and ${mid}.`);
+                setHintRange({ low, high: mid });
+            }
         }
+        setHintsUsed(hintsUsed + 1); // Increase the number of hints used
     };
+    
+
+               
 
     // Timer logic
     useEffect(() => {
