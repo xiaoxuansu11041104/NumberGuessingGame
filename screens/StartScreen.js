@@ -24,6 +24,9 @@ export default function StartScreen() {
     // Create state variables for the modal
     const [showModal, setShowModal] = useState(false); 
 
+    // Create a state variable to continue to the game screen
+    const [continueToGame, setContinueToGame] = useState(false);
+
     // Create a function to handle the name input
     const handleNameChange = (text) => {
         // Set the name state variable to the text input
@@ -86,6 +89,16 @@ export default function StartScreen() {
 
         }
     };
+
+    // Conditionally render the game screen or the form
+    if (continueToGame) {
+        return (
+            <View style={styles.container}>
+                <Text style={styles.gameText}>Welcome to the Game Screen!</Text>
+                {/* Game logic */}
+            </View>
+        );
+    }
 
 
     
@@ -178,7 +191,7 @@ export default function StartScreen() {
                             <Button title="Go Back" onPress={() => setShowModal(false)} color="red" />
                             <Button title="Continue" onPress={() => {
                                 setShowModal(false);
-                                Alert.alert('Proceeding to the game screen!');
+                                setContinueToGame(true);
                             }} color="blue" />
                         </View>
                     </View>
@@ -254,18 +267,18 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(255, 255, 255, 0.9)',
         padding: 20,
         borderRadius: 10,
-        alignItems: 'center',
+        alignItems: 'left',
     },
     modalText: {
         fontSize: 16,
         marginBottom: 10,
-        textAlign: 'center',
+        textAlign: 'left',
         color: 'purple',
     },
     modalButtonContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         marginTop: 20,
-        width: '100%',
+        width: '80%',
     },
 });
