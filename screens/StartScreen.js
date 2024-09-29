@@ -1,8 +1,9 @@
-import { StyleSheet, Text, View, TextInput, Button } from 'react-native'
+import { StyleSheet, Text, View, TextInput, Button, Alert, Modal } from 'react-native'
 import React, { useState } from 'react'
 import Header from '../components/Header'
 import Card from '../components/Card'
 import Checkbox from 'expo-checkbox'; 
+import { LinearGradient } from 'expo-linear-gradient';
 
 export default function StartScreen() {
     // Create state variables for name and nameError
@@ -19,6 +20,9 @@ export default function StartScreen() {
 
     // Create state variables for the checkbox
     const [isSelected, setSelection] = useState(false);
+
+    // Create state variables for the modal
+    const [showModal, setShowModal] = useState(false); 
 
     // Create a function to handle the name input
     const handleNameChange = (text) => {
@@ -71,6 +75,18 @@ export default function StartScreen() {
         setEmailError('');
         setPhoneError('');
     };
+
+    // Function to validate inputs and navigate to the Confirm screen or show an alert
+    const handleRegister = () => {
+        // Validate inputs
+        if (nameError || emailError || phoneError || !name || !email || !phone || !isSelected) {
+            Alert.alert('Invalid Input', 'Please fill out all fields correctly and check the checkbox.');
+        } else {
+            setShowModal(true);
+
+        }
+    };
+
 
     
 
@@ -125,17 +141,49 @@ export default function StartScreen() {
                         />
                         <Text style={styles.checkboxLabel}>I am not a robot</Text>
                     </View>
-                    {/* Reset Button */}
-                    <Button
-                        title="Reset"
-                        onPress={handleReset}
-                        color="red" // Red button for reset action
-                        style={styles.resetButton}
-                    />
+                    {/* View to align Reset and Register buttons in a row */}
+                    <View style={styles.buttonRow}>
+                        {/* Reset Button */}
+                        <Button
+                            title="Reset"
+                            onPress={handleReset}
+                            color="red" // Red button for reset action
+                            style={styles.resetButton}
+                        />
+
+                        {/* Register Button */}
+                        <Button
+                            title="Register"
+                            onPress={handleRegister}
+                            color={isSelected ? 'blue' : 'gray'}
+                            disabled={!isSelected} // Disable the button if the checkbox is not checked
+                            style={styles.resetButton}
+                        />
+                    </View>
 
                 </View>
             </Card>
-            
+            {/* Modal for Confirm screen */}
+            <Modal visible={showModal} transparent={true} animationType="fade">
+                <LinearGradient colors={['rgba(0,0,0,0.5)', 'rgba(0,0,0,0.2)']} style={styles.modalBackground}>
+                    <View style={styles.modalContainer}>
+                        <Text style={styles.modalText}>Hello {name}</Text>
+                        <Text style={styles.modalText}>Here is the information you entered:</Text>
+                        <Text style={styles.modalText}>Email: {email}</Text>
+                        <Text style={styles.modalText}>Phone: {phone}</Text>
+                        <Text style={styles.modalText}>If this is incorrect, please go back and edit.</Text>
+                        
+                        {/* Go Back and Continue Buttons */}
+                        <View style={styles.modalButtonContainer}>
+                            <Button title="Go Back" onPress={() => setShowModal(false)} color="red" />
+                            <Button title="Continue" onPress={() => {
+                                setShowModal(false);
+                                Alert.alert('Proceeding to the game screen!');
+                            }} color="blue" />
+                        </View>
+                    </View>
+                </LinearGradient>
+            </Modal>          
         </View>
     )
 }
@@ -187,5 +235,37 @@ const styles = StyleSheet.create({
     },
     resetButton: {
         marginTop: 20,
+    },
+    registerButton: {
+        marginTop: 20,
+    },
+    buttonRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        width: '100%',
+        paddingHorizontal: 10,
+    },
+    modalBackground: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    modalContainer: {
+        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+        padding: 20,
+        borderRadius: 10,
+        alignItems: 'center',
+    },
+    modalText: {
+        fontSize: 16,
+        marginBottom: 10,
+        textAlign: 'center',
+        color: 'purple',
+    },
+    modalButtonContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginTop: 20,
+        width: '100%',
     },
 });

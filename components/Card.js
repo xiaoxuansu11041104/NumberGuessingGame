@@ -13,7 +13,7 @@ const styles = StyleSheet.create({
     card: {
         width: 300, // width of the card
         height: 500, // height of the card
-        backgroundColor: 'white', // white background
+        backgroundColor: 'grey', // grey background
         borderRadius: 10, // rounded corners
         padding: 20, // padding inside the card
         alignItems: 'center', // center the content horizontally
