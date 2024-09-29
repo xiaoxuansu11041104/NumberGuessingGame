@@ -48,20 +48,20 @@ export default function GameScreen({ phone, onRestart }) {
     
     return (
         <View style={styles.container}>
-            <Header />
+            
             {/* Restart Button on the top right */}
             <View style={styles.restartButtonContainer}>
                 <Text style={styles.restartText} onPress={onRestart}>Restart</Text>
             </View>
-
-            <Card>
+            {/* Custom Card */}
+            <View style={styles.customCard}>
                 <Text style={styles.cardText}>
-                Guess a number between 1 & 100 that is a multiple of 9
+                    Guess a number between 1 & 100 that is a multiple of 9
                 </Text>
                 
                 {/* Start Button */}
                 <Button title="Start Game" onPress={handleStartGame} />
-            </Card>
+            </View>
         </View>
     )
 }
@@ -82,6 +82,29 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontWeight: 'bold',
       },
+
+      customCard: {
+        width: '80%',
+        height: 200,
+        padding: 20,
+        backgroundColor: 'grey',  // Semi-transparent white
+        borderRadius: 10,
+        alignItems: 'center',
+        justifyContent: 'center',
+
+    },
+    cardText: {
+        fontSize: 16,
+        color: 'purple',
+        textAlign: 'center',
+        marginBottom: 20,
+    },
+    startText: {
+        fontSize: 18,
+        color: 'blue',
+        textDecorationLine: 'underline',
+        fontWeight: 'bold',
+    },
     modalText: {
         fontSize: 16,
         color: 'purple',
