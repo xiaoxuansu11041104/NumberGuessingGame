@@ -1,8 +1,9 @@
 import { StyleSheet, Text, View, TextInput, Button, Alert } from 'react-native'
 import React from 'react'
-import { useState } from 'react'
+import { useState, useEffect, hint } from 'react'
 import Card from '../components/Card'
 import Header from '../components/Header';
+import { LinearGradient } from 'expo-linear-gradient';
 
 export default function GameScreen({ phone, onRestart }) {
     // state variables
@@ -29,40 +30,95 @@ export default function GameScreen({ phone, onRestart }) {
     const handleStartGame = () => {
         setGameNumber(generateNumber());
         setIsGameStarted(true);
+        setTimer(60);
     };
 
     // Function to handle the user's guess
     const handleGuess = () => {
+        const numericGuess = parseInt(guess, 10);
+
+        if (isNaN(numericGuess) || numericGuess < 1 || numericGuess > 100) {
+            Alert.alert('Invalid input', 'Please enter a number between 1 and 100.');
+            return;
+        }
+
         if (attempts === 0) {
             Alert.alert('Game Over', 'No more attempts left.');
             return;
         }
+
         setAttempts(attempts - 1);
-        if (parseInt(guess) === gameNumber) {
+
+        if (numericGuess === gameNumber) {
             Alert.alert('Congratulations', 'You guessed the correct number!');
-            setIsGameStarted(false);
+            setIsGameStarted(false);  // End the game
         } else {
             Alert.alert('Try Again', `Incorrect guess. You have ${attempts - 1} attempts left.`);
         }
     };
+
+    // Function to provide a hint
+    const handleHint = () => {
+        if (hint === null) {
+            setHint(`The number is a multiple of ${phone.slice(-1)}`);
+        }
+    };
+
+    // Timer logic
+    useEffect(() => {
+        if (isGameStarted && timer > 0) {
+            const intervalId = setInterval(() => {
+                setTimer(timer - 1);
+            }, 1000);
+
+            return () => clearInterval(intervalId);
+        } else if (timer === 0) {
+            Alert.alert('Time Up', 'You ran out of time!');
+            setIsGameStarted(false);
+        }
+    }, [timer, isGameStarted]);
     
     return (
-        <View style={styles.container}>
-            
-            {/* Restart Button on the top right */}
+        
+        <LinearGradient colors={['#00A8E8', '#B0E0E6']}  style={styles.container}>
+            {/* Restart Button */}
             <View style={styles.restartButtonContainer}>
                 <Text style={styles.restartText} onPress={onRestart}>Restart</Text>
             </View>
-            {/* Custom Card */}
+
+            {/* Game Card */}
             <View style={styles.customCard}>
-                <Text style={styles.cardText}>
-                    Guess a number between 1 & 100 that is a multiple of 9
-                </Text>
-                
-                {/* Start Button */}
-                <Button title="Start Game" onPress={handleStartGame} />
+                <Text style={styles.cardText}>Guess a number between 1 & 100 that is a multiple of {phone.slice(-1)}</Text>
+
+                {isGameStarted ? (
+                    <View style={styles.cardGame}>
+                        {/* Timer and Attempts */}
+                        <Text style={styles.infoText}>Attempts left: {attempts}</Text>
+                        <Text style={styles.infoText}>Time: {timer}s</Text>
+
+                        {/* Text Input for Guess */}
+                        <TextInput
+                            style={styles.input}
+                            value={guess}
+                            onChangeText={setGuess}
+                            placeholder="Enter your guess"
+                            keyboardType="numeric"
+                        />
+
+                        {/* Use a Hint and Submit Guess Buttons */}
+                        <View style={styles.buttonRow}>
+                            <Button title="Use a Hint" onPress={handleHint} />
+                            <Button title="Submit Guess" onPress={handleGuess} />
+                        </View>
+
+                        {/* Display Hint if available */}
+                        {hint && <Text style={styles.hintText}>{hint}</Text>}
+                    </View>
+                ) : (
+                    <Button title="Start" onPress={handleStartGame} />
+                )}
             </View>
-        </View>
+        </LinearGradient>
     )
 }
 
@@ -74,24 +130,28 @@ const styles = StyleSheet.create({
     },
     restartButtonContainer: {
         position: 'absolute',
-        top: 20,
-        right: 20, // position the button on the top right
+        top: 100,
+        right: 40, // position the button on the top right
     },
     restartText: {
         color: 'blue',
         fontSize: 18,
-        fontWeight: 'bold',
-      },
+        
+    },
 
-      customCard: {
+    customCard: {
         width: '80%',
-        height: 200,
+        height: 300,
         padding: 20,
         backgroundColor: 'grey',  // Semi-transparent white
         borderRadius: 10,
         alignItems: 'center',
         justifyContent: 'center',
 
+    },
+    cardGame: {
+        width: '100%',
+        alignItems: 'center',
     },
     cardText: {
         fontSize: 16,
@@ -110,5 +170,32 @@ const styles = StyleSheet.create({
         color: 'purple',
         marginBottom: 10,
         textAlign: 'center',
+    },
+
+    infoText: {
+        fontSize: 16,
+        textAlign: 'center',
+        marginBottom: 10,
+    },
+    hintText: {
+        fontSize: 14,
+        color: 'green',
+        textAlign: 'center',
+        marginTop: 10,
+    },
+    input: {
+        height: 40,
+        borderColor: 'purple',
+        borderWidth: 1,
+        paddingHorizontal: 10,
+        marginBottom: 20,
+        width: '100%',
+        borderRadius: 5,
+        alignItems: 'center',
+    },
+    buttonRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        width: '100%',
     },
 })
