@@ -4,6 +4,8 @@ import Header from '../components/Header'
 import Card from '../components/Card'
 import Checkbox from 'expo-checkbox'; 
 import { LinearGradient } from 'expo-linear-gradient';
+import GameScreen from './GameScreen';
+
 
 export default function StartScreen() {
     // Create state variables for name and nameError
@@ -90,19 +92,13 @@ export default function StartScreen() {
         }
     };
 
-    // Conditionally render the game screen or the form
+
+    // Conditionally render the GameScreen when `continueToGame` is true
     if (continueToGame) {
-        return (
-            <View style={styles.container}>
-                <Text style={styles.gameText}>Welcome to the Game Screen!</Text>
-                {/* Game logic */}
-            </View>
-        );
+        return <GameScreen phone={phone} onRestart={() => setContinueToGame(false)} />;
     }
 
-
-    
-
+    // Return the start screen
     return (
         <View style={styles.container}>
             {/* display the header here */}
