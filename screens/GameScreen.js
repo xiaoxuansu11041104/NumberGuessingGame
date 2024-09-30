@@ -17,6 +17,8 @@ export default function GameScreen({ phone, onRestart }) {
     const [hintsUsed, setHintsUsed] = useState(0); // Number of hints used
     const [feedback, setFeedback] = useState(null); // Track higher/lower feedback
     const [gameOver, setGameOver] = useState(false);
+    const [showFeedbackCard, setShowFeedbackCard] = useState(false);
+    const [feedbackText, setFeedbackText] = useState('');
 
     // Function to generate the number to guess
     const generateNumber = () => {
@@ -36,6 +38,11 @@ export default function GameScreen({ phone, onRestart }) {
         setGameNumber(generateNumber());
         setIsGameStarted(true);
         setTimer(60);
+        setFeedback(null); // Reset feedback
+        setHint(null); // Reset hints
+        setHintRange({ low: 0, high: 100 }); // Reset the hint range
+        setHintsUsed(0); // Reset hints count
+        setShowFeedbackCard(false); // Hide feedback card
     };
 
     // Function to handle the user's guess
@@ -60,10 +67,11 @@ export default function GameScreen({ phone, onRestart }) {
         } else {
             // Set feedback based on whether the guess is higher or lower than the number
             if (numericGuess < gameNumber) {
-                setFeedback('higher');
+                setFeedbackText('You should guess higher.');
             } else {
-                setFeedback('lower');
+                setFeedbackText('You should guess lower.');
             }
+            setShowFeedbackCard(true);
         }
     };
 
@@ -123,50 +131,71 @@ export default function GameScreen({ phone, onRestart }) {
             setIsGameStarted(false);
         }
     }, [timer, isGameStarted]);
+
+    // Game over screen
+    if (gameOver) {
+        return (
+            <LinearGradient colors={['#00A8E8', '#B0E0E6']} style={styles.container}>
+                <View style={styles.customCard}>
+                    <Text style={styles.cardText}>Game Over</Text>
+                    <Button title="Restart Game" onPress={onRestart} />
+                </View>
+            </LinearGradient>
+        );
+    }
     
     return (
-        
-        <LinearGradient colors={['#00A8E8', '#B0E0E6']}  style={styles.container}>
+        <LinearGradient colors={['#00A8E8', '#B0E0E6']} style={styles.container}>
             {/* Restart Button */}
             <View style={styles.restartButtonContainer}>
                 <Text style={styles.restartText} onPress={onRestart}>Restart</Text>
             </View>
 
-            {/* Game Card */}
-            <View style={styles.customCard}>
-                <Text style={styles.cardText}>Guess a number between 1 & 100 that is a multiple of {phone.slice(-1)}</Text>
+            {!showFeedbackCard ? (
+                <View style={styles.customCard}>
+                    <Text style={styles.cardText}>Guess a number between 1 & 100 that is a multiple of {phone.slice(-1)}</Text>
 
-                {isGameStarted ? (
-                    <View style={styles.cardGame}>
-                        {/* Timer and Attempts */}
-                        <Text style={styles.infoText}>Attempts left: {attempts}</Text>
-                        <Text style={styles.infoText}>Time: {timer}s</Text>
+                    {isGameStarted ? (
+                        <View style={styles.cardGame}>
+                            <Text style={styles.infoText}>Attempts left: {attempts}</Text>
+                            <Text style={styles.infoText}>Time: {timer}s</Text>
 
-                        {/* Text Input for Guess */}
-                        <TextInput
-                            style={styles.input}
-                            value={guess}
-                            onChangeText={setGuess}
-                            placeholder="Enter your guess"
-                            keyboardType="numeric"
-                        />
+                            <TextInput
+                                style={styles.input}
+                                value={guess}
+                                onChangeText={setGuess}
+                                placeholder="Enter your guess"
+                                keyboardType="numeric"
+                            />
 
-                        {/* Use a Hint and Submit Guess Buttons */}
-                        <View style={styles.buttonRow}>
-                            <Button title="Use a Hint" onPress={handleHint} />
-                            <Button title="Submit Guess" onPress={handleGuess} />
+                            <View style={styles.buttonRow}>
+                                <Button title="Use a Hint" onPress={handleHint} />
+                                <Button title="Submit Guess" onPress={handleGuess} />
+                            </View>
+
+                            {hint && <Text style={styles.hintText}>{hint}</Text>}
                         </View>
-
-                        {/* Display Hint if available */}
-                        {hint && <Text style={styles.hintText}>{hint}</Text>}
+                    ) : (
+                        <Button title="Start" onPress={handleStartGame} />
+                    )}
+                </View>
+            ) : (
+                <View style={styles.feedbackCard}>
+                    <Text style={styles.feedbackText}>You did not guess correct! {feedbackText}</Text>
+                    
+                    <View style={styles.feedbackButtonRow}>
+                        <Button title="Try Again" onPress={() => {
+                            setShowFeedbackCard(false);
+                            setGuess('');
+                        }} />
+                        <Button title="End the Game" onPress={onRestart} />
                     </View>
-                ) : (
-                    <Button title="Start" onPress={handleStartGame} />
-                )}
-            </View>
+                </View>
+            )}
         </LinearGradient>
-    )
+    );
 }
+
 
 const styles = StyleSheet.create({
     container: {
@@ -240,6 +269,26 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     buttonRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        width: '100%',
+    },
+    feedbackCard: {
+        width: '80%',
+        height: 300,
+        padding: 20,
+        backgroundColor: 'grey',  // Semi-transparent white
+        borderRadius: 10,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    feedbackText: {
+        fontSize: 16,
+        marginBottom: 15,
+        textAlign: 'center',
+        color: 'purple',
+    },
+    feedbackButtonRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         width: '100%',
