@@ -44,6 +44,8 @@ export default function GameScreen({ phone, onRestart }) {
         setHintsUsed(0); // Reset hints count
         setShowFeedbackCard(false); // Hide feedback card
         setCorrectGuess(false); // Reset correct guess
+        setAttempts(4); // Reset attempts
+        setGuess(''); // Clear the input
     };
 
     // Function to handle the user's guess
@@ -141,7 +143,7 @@ export default function GameScreen({ phone, onRestart }) {
             <LinearGradient colors={['#00A8E8', '#B0E0E6']} style={styles.container}>
                 <View style={styles.customCard}>
                     <Text style={styles.cardText}>You guessed correct!</Text>
-                    <Text style={styles.cardText}>Attempts used: {attempts}</Text>
+                    <Text style={styles.cardText}>Attempts used: {4-attempts}</Text>
 
                     {/* Display image based on the gameNumber */}
                     <Image
