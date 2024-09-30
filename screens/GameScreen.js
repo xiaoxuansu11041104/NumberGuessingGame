@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, TextInput, Button, Alert } from 'react-native'
+import { StyleSheet, Text, View, TextInput, Button, Alert, Image } from 'react-native'
 import React from 'react'
 import { useState, useEffect, hint } from 'react'
 import Card from '../components/Card'
@@ -15,10 +15,10 @@ export default function GameScreen({ phone, onRestart }) {
     const [hint, setHint] = useState(null);
     const [hintRange, setHintRange] = useState({ low: 0, high: 100 }); // Initial range
     const [hintsUsed, setHintsUsed] = useState(0); // Number of hints used
-    const [feedback, setFeedback] = useState(null); // Track higher/lower feedback
     const [gameOver, setGameOver] = useState(false);
     const [showFeedbackCard, setShowFeedbackCard] = useState(false);
     const [feedbackText, setFeedbackText] = useState('');
+    const [correctGuess, setCorrectGuess] = useState(false);
 
     // Function to generate the number to guess
     const generateNumber = () => {
@@ -38,11 +38,12 @@ export default function GameScreen({ phone, onRestart }) {
         setGameNumber(generateNumber());
         setIsGameStarted(true);
         setTimer(60);
-        setFeedback(null); // Reset feedback
+        setFeedbackText(''); // Reset feedback
         setHint(null); // Reset hints
         setHintRange({ low: 0, high: 100 }); // Reset the hint range
         setHintsUsed(0); // Reset hints count
         setShowFeedbackCard(false); // Hide feedback card
+        setCorrectGuess(false); // Reset correct guess
     };
 
     // Function to handle the user's guess
@@ -62,8 +63,8 @@ export default function GameScreen({ phone, onRestart }) {
         setAttempts(attempts - 1);
 
         if (numericGuess === gameNumber) {
-            Alert.alert('Congratulations', 'You guessed the correct number!');
-            setIsGameStarted(false);  // End the game
+            setCorrectGuess(true);  // Set this to true when the user guesses correctly
+            setIsGameStarted(false); // Stop the game
         } else {
             // Set feedback based on whether the guess is higher or lower than the number
             if (numericGuess < gameNumber) {
@@ -112,7 +113,8 @@ export default function GameScreen({ phone, onRestart }) {
     // Function to reset the game
     const handleTryAgain = () => {
         setGuess(''); // Clear the input
-        setFeedback(null); // Reset the feedback
+        setFeedbackText(''); // Reset feedback text
+        setShowFeedbackCard(false); // Hide feedback card
     };
     
 
@@ -132,13 +134,22 @@ export default function GameScreen({ phone, onRestart }) {
         }
     }, [timer, isGameStarted]);
 
+    
     // Game over screen
-    if (gameOver) {
+    if (correctGuess) {
         return (
             <LinearGradient colors={['#00A8E8', '#B0E0E6']} style={styles.container}>
                 <View style={styles.customCard}>
-                    <Text style={styles.cardText}>Game Over</Text>
-                    <Button title="Restart Game" onPress={onRestart} />
+                    <Text style={styles.cardText}>You guessed correct!</Text>
+                    <Text style={styles.cardText}>Attempts used: {attempts}</Text>
+
+                    {/* Display image based on the gameNumber */}
+                    <Image
+                        source={{ uri: `https://picsum.photos/id/${gameNumber}/100/100` }}
+                        style={styles.image}
+                    />
+
+                    <Button title="New Game" onPress={handleStartGame} />
                 </View>
             </LinearGradient>
         );
@@ -289,8 +300,13 @@ const styles = StyleSheet.create({
         color: 'purple',
     },
     feedbackButtonRow: {
-        flexDirection: 'row',
+        flexDirection: 'column',
         justifyContent: 'space-between',
         width: '100%',
+    },
+    image: {
+        width: 100,
+        height: 100,
+        marginBottom: 20,
     },
 })
