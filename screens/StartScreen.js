@@ -92,10 +92,20 @@ export default function StartScreen() {
         }
     };
 
+    // Reset state on restart
+    const handleRestart = () => {
+        setContinueToGame(false); // Navigate back to StartScreen
+        setName(''); // Clear name
+        setEmail(''); // Clear email
+        setPhone(''); // Clear phone number
+        setSelection(false); // Uncheck the checkbox
+        
+    };
+
 
     // Conditionally render the GameScreen when `continueToGame` is true
     if (continueToGame) {
-        return <GameScreen phone={phone} onRestart={() => setContinueToGame(false)} />;
+        return <GameScreen phone={phone} onRestart={handleRestart} />;
     }
 
     // Return the start screen
