@@ -10,6 +10,7 @@ export default function GameScreen({ phone, onRestart }) {
     const [gameNumber, setGameNumber] = useState(null);
     const [timer, setTimer] = useState(60);
     const [attempts, setAttempts] = useState(4);
+    const [totalAttempts, setTotalAttempts] = useState(0);
     const [isGameStarted, setIsGameStarted] = useState(false);
     const [guess, setGuess] = useState('');
     const [hint, setHint] = useState(null);
@@ -19,6 +20,7 @@ export default function GameScreen({ phone, onRestart }) {
     const [showFeedbackCard, setShowFeedbackCard] = useState(false);
     const [feedbackText, setFeedbackText] = useState('');
     const [correctGuess, setCorrectGuess] = useState(false);
+    const [gameOverReason, setGameOverReason] = useState('');
 
     // Function to generate the number to guess
     const generateNumber = () => {
@@ -46,6 +48,8 @@ export default function GameScreen({ phone, onRestart }) {
         setCorrectGuess(false); // Reset correct guess
         setAttempts(4); // Reset attempts
         setGuess(''); // Clear the input
+        setTotalAttempts(0); // Reset total attempts used
+        setGameOver(false); // Reset game over
     };
 
     // Function to handle the user's guess
@@ -75,6 +79,12 @@ export default function GameScreen({ phone, onRestart }) {
                 setFeedbackText('You should guess lower.');
             }
             setShowFeedbackCard(true);
+
+            // Check if the user is out of attempts after decrement
+            if (attempts - 1 === 0) {
+                setGameOverReason('You are out of attempts.');
+                setGameOver(true);  
+            }
         }
     };
 
@@ -109,6 +119,7 @@ export default function GameScreen({ phone, onRestart }) {
     const handleEndGame = () => {
         setGameOver(true);
         setIsGameStarted(false);
+        setGameOverReason('You ended the game.');
     };
 
 
@@ -119,6 +130,13 @@ export default function GameScreen({ phone, onRestart }) {
         setShowFeedbackCard(false); // Hide feedback card
     };
     
+    
+    useEffect(() => {
+        if (attempts === 0 && isGameStarted) {
+            setGameOverReason('You are out of attempts.');
+            setGameOver(true);
+        }
+    }, [attempts, isGameStarted]);
 
                
 
@@ -131,8 +149,9 @@ export default function GameScreen({ phone, onRestart }) {
 
             return () => clearInterval(intervalId);
         } else if (timer === 0) {
-            Alert.alert('Time Up', 'You ran out of time!');
+            setGameOver(true);
             setIsGameStarted(false);
+            setGameOverReason('You are out of time.');
         }
     }, [timer, isGameStarted]);
 
@@ -151,6 +170,23 @@ export default function GameScreen({ phone, onRestart }) {
                         style={styles.image}
                     />
 
+                    <Button title="New Game" onPress={handleStartGame} />
+                </View>
+            </LinearGradient>
+        );
+    }
+
+    // Game over screen
+    if (gameOver) {
+        return (
+            <LinearGradient colors={['#00A8E8', '#B0E0E6']} style={styles.container}>
+                <View style={styles.customCard}>
+                    <Text style={styles.cardText}>The game is over!</Text>
+                    <Image
+                        source={require('../assets/Sad-Face-Emoji.png')} 
+                        style={styles.image}
+                    />
+                    <Text style={styles.cardText}>{gameOverReason}</Text>
                     <Button title="New Game" onPress={handleStartGame} />
                 </View>
             </LinearGradient>
@@ -201,7 +237,7 @@ export default function GameScreen({ phone, onRestart }) {
                             setShowFeedbackCard(false);
                             setGuess('');
                         }} />
-                        <Button title="End the Game" onPress={onRestart} />
+                        <Button title="End the Game" onPress={handleEndGame} />
                     </View>
                 </View>
             )}
