@@ -15,6 +15,8 @@ export default function GameScreen({ phone, onRestart }) {
     const [hint, setHint] = useState(null);
     const [hintRange, setHintRange] = useState({ low: 0, high: 100 }); // Initial range
     const [hintsUsed, setHintsUsed] = useState(0); // Number of hints used
+    const [feedback, setFeedback] = useState(null); // Track higher/lower feedback
+    const [gameOver, setGameOver] = useState(false);
 
     // Function to generate the number to guess
     const generateNumber = () => {
@@ -56,7 +58,12 @@ export default function GameScreen({ phone, onRestart }) {
             Alert.alert('Congratulations', 'You guessed the correct number!');
             setIsGameStarted(false);  // End the game
         } else {
-            Alert.alert('Try Again', `Incorrect guess. You have ${attempts - 1} attempts left.`);
+            // Set feedback based on whether the guess is higher or lower than the number
+            if (numericGuess < gameNumber) {
+                setFeedback('higher');
+            } else {
+                setFeedback('lower');
+            }
         }
     };
 
@@ -85,6 +92,19 @@ export default function GameScreen({ phone, onRestart }) {
             }
         }
         setHintsUsed(hintsUsed + 1); // Increase the number of hints used
+    };
+
+    // Function to end the game
+    const handleEndGame = () => {
+        setGameOver(true);
+        setIsGameStarted(false);
+    };
+
+
+    // Function to reset the game
+    const handleTryAgain = () => {
+        setGuess(''); // Clear the input
+        setFeedback(null); // Reset the feedback
     };
     
 
